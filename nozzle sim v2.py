@@ -37,7 +37,7 @@ Rspecific=R/AverageMolecularWeight
 #machExit=math.sqrt((2/(gam-1))*(Pt/p0)**((gam-1)/gam)-1) #WROOOOOOONNNG?
 Texit=((p0/Pt)**((gam - 1)/gam))*Tt
 Vexit=math.sqrt(((2*gam)/(gam-1))*Rspecific*Tt*(1-(p0/Pt)**((gam-1)/gam)))
-machExit=Vexit/math.sqrt(gam*R*Texit) #derived. more below
+machExit=Vexit/math.sqrt(gam*Rspecific*Texit) #derived. more below
 
 #AoverAstar=9.297 #get from calculator
 #to get area at exit for use in base equations
