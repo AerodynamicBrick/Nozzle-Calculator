@@ -1,78 +1,109 @@
-#https://www.grc.nasa.gov/WWW/K-12/airplane/rktthsum.html
-#https://www.grc.nasa.gov/WWW/K-12/airplane/isentrop.html
-#https://www.grc.nasa.gov/www/k-12/airplane/mflchk.html
+#hT1ps://www.grc.nasa.gov/WWW/K-12/airplane/rkT1hsum.html
+#hT1ps://www.grc.nasa.gov/WWW/K-12/airplane/isentrop.html
+#hT1ps://www.grc.nasa.gov/www/k-12/airplane/mflchk.html
 
 import math
+import sys
 
 
-def Fahrenheit_to_Kelvin(F): 
+p1=vv #1 is chamber pressure
+k = 1.2 #property of your working fluid
+T1=3633 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
+p3=67913 #free stream pressure outside nozzle -> Pa        1 atm?
+p2=p3 #True for best performance
+AverageMolecularWeight=0.02267 #this is in kg. Not typical for molecular weight
+
+print 'Number of arguments:', len(sys.argv), 'arguments.'
+print 'Argument List:', str(sys.argv)
+if len(sys.argv) == 6:
+    p1 = sys.argv[0]
+    k = sys.argv[1]
+    T1 = sys.argv[2]
+    p3 = sys.argv[3]
+    p2 = sys.argv[4]
+    AverageMolecularWeight = sys.argv[5]
+elif len(sys.argv) == 5:
+    p1 = sys.argv[0]
+    k = sys.argv[1]
+    T1 = sys.argv[2]
+    p3 = sys.argv[3]
+    p2 = p3
+    AverageMolecularWeight = sys.argv[4]
+elif len(sys.argv) == 1:
+    if(lower(sys.argv[0]) == "help"):
+        print("""
+        p1, k, T1, p3, p2(optional), MolecWeight
+        """)
+
+def Fahrenheit_to_Kelvin(F):
     return 273.5 + ((F - 32.0) * (5.0/9.0))
 
-
-Pt=2068000 #1500psi --> Pa #Pt is chamber pressure
-gam = 1.3 #property of your working fluid
-Tt=Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber
-p0=101352.932 #free stream pressure outside nozzle -> Pa        1 atm?
-AverageMolecularWeight=0.024049 #this is in kg. Not typical for molecular weight
-
+pi=3.14159265
 R=8.314462 #gas constant
+Rspecific=R/AverageMolecularWeight
 
+pt=((2/(k+1))**(k/(k-1)))*p1 #57
+Tt=(2*T1)/(k+1) #page 57
+vt=math.sqrt(((2*k)/(k+1))*Rspecific*T1) #page 57
+
+
+v2=math.sqrt(((2*k)/(k-1))*Rspecific*T1*(1-(p2/p1)**((k-1)/k))) #page 54
+T2=T1*(p2/p1)**((k-1)/k)
+M2=v2/math.sqrt(k*Rspecific*T2)
+
+V1=Rspecific*T1/p1 #page 55
+Vt=V1*((k+1)/2)**(1/(k-1)) #page 57
 while True:
     print("""Select input parameter by number
     1. Mass Flow
-    2. Throat radius""")
+    2. Throat radius
+    3. Thrust""")
     mode=input()
     if mode=="1":
-        userMassFlow=float(input("Input Desired Mass Flow in kg/s"))
-        r = (2**((-1*(gam+1))/(4*(gam-1)))*(gam+1)**(-(gam+1)/(2*(2-(2*gam))))*math.sqrt(userMassFlow)*Tt**(1/4))/(math.sqrt(3.14159)*math.sqrt(Pt)*(gam/R)**(1/4))
+        mdot=float(input("Input Desired Mass Flow in kg/s"))
+        At=(mdot*Vt)/vt
+        #print("At 1: " + (mdot/pt)*math.sqrt((Rspecific*Tt)/AverageMolecularWeight*k)) #wrong
+        #print("At 2: " + str((mdot*Vt)/vt)) #derived from 3-24 on page 59 #correct
+        #print("At 3: " + str((mdot*math.sqrt(T1)*((1/2)*(k-1)*(M2**2)+1)**((-1*k)/(2-2*k)-1/(2-2*k)))/(M2*p1*math.sqrt(k/Rspecific)))) #wrong
+        #A2=At*(1/M2)*((1+((k-1)/2))/((k+1)/2))**((k+1)/(2*(k-1)))
+        A2overAt=((1+M2**2*(k-1)/2)**((k+1)/(k-1)/2))*(((k+1)/2)**(-1*((k+1)/(k-1)/2)))/M2
+        A2=A2overAt*At
         break
     elif mode=="2":
         r=float(input("Input Desired throat radius in meters"))
+        At=pi*(r**2) #area of a circle from radius
+        A2=At/((((k+1)/2)**(1/(k-1)))*((p2/p1)**(1/k))*math.sqrt(((k+1)/(k-1))*(1-((p2/p1)**((k-1)/k)))))
+        mdot=At*p1*k*((2/(k+1))**((k+1)/(k-1)))/math.sqrt(k*Rspecific*T1)
         break
     else:
         print("Input not recognised. Please try again.")
 
-Rspecific=R/AverageMolecularWeight
 
-#machExit=math.sqrt((2/(gam-1))*(Pt/p0)**((gam-1)/gam)-1) #WROOOOOOONNNG?
-Texit=((p0/Pt)**((gam - 1)/gam))*Tt
-Vexit=math.sqrt(((2*gam)/(gam-1))*Rspecific*Tt*(1-(p0/Pt)**((gam-1)/gam)))
-machExit=Vexit/math.sqrt(gam*Rspecific*Texit) #derived. more below
-
-#AoverAstar=9.297 #get from calculator
-#to get area at exit for use in base equations
-Athroat=3.1415*(r**2.0)
-AoverAstar=(((gam+1)/2)**(-1*((gam+1)/(2*(gam-1)))))*(((1+((gam-1)/2)*((machExit)**2))**((gam+1)/(2*(gam-1))))/machExit)
-Aexit=Athroat*AoverAstar
-
-#base equasions
-mdot=((Athroat*Pt)/math.sqrt(Tt))*math.sqrt(gam/R)*((gam+1)/2)**(-1*((gam+1)/(2*(gam-1))))
-
-
-#ToverTt=((1 + (machExit**2) * ((gam-1)/2))**(-1)) updated below with RPE eq above
-#Texit=ToverTt*Tt #calculated earlier from Tx/Ty=(px/py)^((k-1)/k) on page 48 of RPE
-ToverTt=Texit/Tt
-
-
-PeOverPt=((1+(machExit**2)*((gam-1)/2))**(-1*(gam/(gam-1))))
-Pexit=PeOverPt*Pt
-
-#VexitFromMach = machExit * math.sqrt(gam * R * Texit) #Already solved for without using mach@exit. See RPE page 52
-F = mdot * Vexit + (Pexit - p0) * Aexit
+F = mdot * v2 + (p2 - p3) * A2
 
 print("Force: "+str(round(F, 4))+"\n")
+
 print("Mass Flow Rate: "+str(round(mdot, 4)))
+print("Mach at exit: "+str(round(M2, 4))+"\n")
 
-print("Choke Flow diameter: "+str(round(2*r, 4)))
-print("Exit diameter: "+str(round(2*r*AoverAstar, 4)))
-print("A/A*: "+str(round(AoverAstar, 4))+"\n")
+#print("p1: "+str(round(p1, 4))) #given
+#print("T1: "+str(round(T1, 4))+"\n") #given
 
-print("Mach at exit: "+str(round(machExit, 4)))
-print("Temperature at exit: "+str(round(Texit, 4)))
-print("Pressure at exit: "+str(round(Pexit, 4)))
-print("Velocity at exit: "+str(round(Vexit, 4))+"\n")
-#print("Velocity at exit from Mach: "+str(round(VexitFromMach, 4))+"\n") #equal to above line
+print("vt: "+str(round(vt, 4))) #HH p10
+print("pt: "+str(round(pt, 4)))
+print("At: "+str(round(At, 4)))
+print("Tt: "+str(round(Tt, 4))+"\n")
+
+print("v2: "+str(round(v2, 4)))
+#print("p2: "+str(round(p2, 4))) #given
+print("A2: "+str(round(A2, 4)))
+print("T2: "+str(round(T2, 4))+"\n")
+
+#print("p3: "+str(round(p3, 4))) #given
+
+print("p2/p1: "+str(round(p2/p1, 4)))
+print("A2/At: "+str(round(A2/At, 4))) ##HH pg8
+print("Tt/T2: "+str(round(T2/T1, 4)))
 
 print("Specific Gas constant: " + str(Rspecific))
-print("T/Tt: " + str(ToverTt))
-print("Pe/Pt: " + str(PeOverPt))
+
