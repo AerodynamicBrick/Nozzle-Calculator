@@ -6,15 +6,16 @@ import math
 import sys
 
 
-p1=vv #1 is chamber pressure
+p1=6894757.29318 #1 is chamber pressure
 k = 1.2 #property of your working fluid
-T1=3633 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
-p3=67913 #free stream pressure outside nozzle -> Pa        1 atm?
+T1=3633.3333 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
+p3=67913.3593 #free stream pressure outside nozzle -> Pa        1 atm?
 p2=p3 #True for best performance
-AverageMolecularWeight=0.02267 #this is in kg. Not typical for molecular weight
+AverageMolecularWeight=0.02267 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
 
-print 'Number of arguments:', len(sys.argv), 'arguments.'
-print 'Argument List:', str(sys.argv)
+"""
+print('Number of arguments:'+ len(sys.argv))
+print('Argument List:'+ str(sys.argv))
 if len(sys.argv) == 6:
     p1 = sys.argv[0]
     k = sys.argv[1]
@@ -31,10 +32,8 @@ elif len(sys.argv) == 5:
     AverageMolecularWeight = sys.argv[4]
 elif len(sys.argv) == 1:
     if(lower(sys.argv[0]) == "help"):
-        print("""
-        p1, k, T1, p3, p2(optional), MolecWeight
-        """)
-
+        print("p1, k, T1, p3, p2(optional), MolecWeight")
+"""
 def Fahrenheit_to_Kelvin(F):
     return 273.5 + ((F - 32.0) * (5.0/9.0))
 
@@ -90,20 +89,20 @@ print("Mach at exit: "+str(round(M2, 4))+"\n")
 #print("T1: "+str(round(T1, 4))+"\n") #given
 
 print("vt: "+str(round(vt, 4))) #HH p10
-print("pt: "+str(round(pt, 4)))
-print("At: "+str(round(At, 4)))
-print("Tt: "+str(round(Tt, 4))+"\n")
+print("pt: "+str(round(pt, 4))) #HH p9 close nuf
+print("At: "+str(round(At, 4))) #HH p9
+print("Tt: "+str(round(Tt, 4))+"\n") #HH pg 9
 
-print("v2: "+str(round(v2, 4)))
+print("v2: "+str(round(v2, 4))) #HH pg 10 close nuf
 #print("p2: "+str(round(p2, 4))) #given
-print("A2: "+str(round(A2, 4)))
-print("T2: "+str(round(T2, 4))+"\n")
+print("A2: "+str(round(A2, 4))) #HH p10
+print("T2: "+str(round(T2, 4))+"\n") #HH p9
 
 #print("p3: "+str(round(p3, 4))) #given
 
-print("p2/p1: "+str(round(p2/p1, 4)))
+print("p2/p1: "+str(round(p2/p1, 4))) #HH
 print("A2/At: "+str(round(A2/At, 4))) ##HH pg8
-print("Tt/T2: "+str(round(T2/T1, 4)))
+print("Tt/T2: "+str(round(T2/T1, 4))) #investigate further
 
 print("Specific Gas constant: " + str(Rspecific))
 
