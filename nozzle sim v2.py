@@ -140,8 +140,11 @@ if(genfileq=="yes"):
     ws['B7'] = str(float(input("Converging angle in degrees:")))
     ws['C7'] = "deg"
 
-    ws['B8'] = str(str(float(input("Rao Throat radius in INCHES:")))+" in")
-    ws['C8'] = "in"
+    #ws['B8'] = str(str(float(input("Rao Throat radius in INCHES:")))+" in")
+    #ws['C8'] = "in"
+
+    ws['B8'] = str(math.sqrt(At/3.14))
+    ws['C8'] = "m"
 
     wb.save("partgenout.xlsx")
 elif(genfileq.lower()=="no"):
