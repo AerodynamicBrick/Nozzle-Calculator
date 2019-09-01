@@ -9,12 +9,12 @@ import sys
 import openpyxl
 
 
-p1=6894757.29318 #1 is chamber pressure
-k = 1.2 #property of your working fluid
-T1=3633.3333 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
-p3=67913.3593 #free stream pressure outside nozzle -> Pa        1 atm?
+p1=4136856 #1 is chamber pressure
+k = 1.4 #property of your working fluid
+T1=288.7056 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
+p3=75842.3302 #free stream pressure outside nozzle -> Pa        1 atm?
 p2=p3 #True for best performance
-AverageMolecularWeight=0.02267 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
+AverageMolecularWeight=0.02801 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
 
 """
 print('Number of arguments:'+ len(sys.argv))
