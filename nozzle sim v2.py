@@ -107,7 +107,9 @@ print("T2: "+str(round(T2, 6))+"\n") #HH p9
 
 print("p2/p1: "+str(round(p2/p1, 6))) #HH
 print("A2/At: "+str(round(A2/At, 8))) ##HH pg8
-print("Tt/T2: "+str(round(T2/T1, 6))) #investigate further
+print("Tt/T2: "+str(round(Tt/T2, 6))) #fixed probably?
+
+print("Pc-injector/Pc-stagnation")
 
 print("Specific Gas constant: " + str(round(Rspecific,6)))
 
