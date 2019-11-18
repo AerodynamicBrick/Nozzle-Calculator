@@ -1,3 +1,4 @@
+
 #huzel and huang
 #Rocket Propulsion Elements
 #www.grc.nasa.gov/
@@ -10,11 +11,11 @@ import openpyxl
 
 
 p1=6894.76*350 #p1 is chamber pressure
-k = 1.2366 #property of your working fluid
-T1=3066 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
-p3=6894.76*14.5 #free stream pressure outside nozzle -> Pa        1 atm?
+k = 1.23 #property of your working fluid
+T1=2900 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
+p3=6894.76*14.65 #free stream pressure outside nozzle -> Pa
 p2=p3 #True for best performance
-AverageMolecularWeight=0.024677 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
+AverageMolecularWeight=0.025 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
 
 """
 print('Number of arguments:'+ len(sys.argv))
@@ -158,7 +159,7 @@ else:
 print("\nHeat Transfer:")
 LOption=input("Attempt L* calculation?")
 if(LOption==lower("yes")):
-    #stub
+    print("Still in progress")#stub
 elif(LOption==lower("no")):
     LStar=1.5 #meters
 Vc=LStar*At #chamber volume #rpe 287
