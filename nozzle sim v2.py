@@ -158,9 +158,9 @@ else:
 #heat transfer and chamber
 print("\nHeat Transfer:")
 LOption=input("Attempt L* calculation?")
-if(LOption==lower("yes")):
+if(LOption.lower()=="yes"):
     print("Still in progress")#stub
-elif(LOption==lower("no")):
+elif(LOption.lower()=="no"):
     LStar=1.5 #meters
 Vc=LStar*At #chamber volume #rpe 287
 print("Vc: "+str(round(Vc, 4)))
@@ -170,22 +170,25 @@ print("ts: "+str(round(ts, 4)))
 Dc=input("Input chamber diameter: ")
 if(Dc==""):
     Dc=0.05 #~2 in default chamber diameter
+Dc=float(Dc)
 
-A1=pi*(Dc/2)^2 #circles dawg
+A1=pi*(Dc/2)**2 #circles dawg
 
 ConvergenceAngle=input("Input Convergence half angle in deg (default 30 deg): ")
 if(ConvergenceAngle==""):
     ConvergenceAngle=math.radians(30) #default convergence angle
 
-Lc=Dc*math.tan(math.rad(ConvergenceAngle)) #triangles dawg
+Lc=Dc*math.tan(ConvergenceAngle) #triangles dawg
 L1=(Vc-A1*Lc*(1+math.sqrt(At/A1)+At/A1))/A1 #modified from RPE pg 285
 
+print("L1: "+str(L1))
+
 DeltaPQuestion=input(">INPUT< Pressure drop or >CALC< pressure drop")
-if(DeltaPQuestion==lower("input")):
+if(DeltaPQuestion.lower()=="input"):
     DeltaP_regen=input("Input Pressure Drop due to cooling passages")
     if(DeltaP_regen==""):
         DeltaP_regen=p1*.1 #default of 10% of chamber pressure
-elif(DeltaPQuestion==lower("calc")):
+elif(DeltaPQuestion=="calc"):
     LenCoolantPipe=input("Input Length of coolant passage")
     if(LenCoolantPipe==""):
         LenCoolantPipe=0.4572 #~18in to m default passage length
