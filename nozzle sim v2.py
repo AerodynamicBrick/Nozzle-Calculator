@@ -9,14 +9,30 @@ import math
 import sys
 import openpyxl
 
+def rho_liquid(T):
+    Tc=309.57
+    Tr=T/Tc
+    #Density of saturated liquid
+    #eq 4.2 thermophysical properties
+    #Aplicable from -90C to 36C
+    #constants
+    rho_c=452.0 #critical density
+    e=2.718281828459
+    b1=1.72328
+    b2=-.83950
+    b3=.51060
+    b4=-.10412
+    return(rho_c*(e**(b1*(1-Tr)**(1/3)+b2*(1-Tr)**(2/3)+b3*(1-Tr)+b4*(1-Tr)**(4/3))))
+
+
 
 p1=6894.76*350 #p1 is chamber pressure
-k = 1.23 #property of your working fluid
-T1=2900 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
-p3=6894.76*14.65 #free stream pressure outside nozzle -> Pa
+k = 1.236844 #property of your working fluid
+T1=3057.93 #Fahrenheit_to_Kelvin(3539.93) #temperature in the chamber in kelvin
+p3=6894.76*14.5 #free stream pressure outside nozzle -> Pa
 p2=p3 #True for best performance
-AverageMolecularWeight=0.025 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
-
+AverageMolecularWeight=0.02466018 #this is in kg. Not typical for molecular weight. Rs=Ru/MolarMass
+LStar=1.67#meters
 """
 print('Number of arguments:'+ len(sys.argv))
 print('Argument List:'+ str(sys.argv))
@@ -62,8 +78,11 @@ while True:
     print("""Select input parameter by number
     1. Mass Flow""")
     mode=input()
-    if mode=="1":
-        mdot=float(input("Input Desired Mass Flow in kg/s"))
+    if(mode=="1") or mode=="":
+        mdot=input("Input Desired Mass Flow in kg/s (default = .25)")
+        if(mdot==""):
+            mdot=.25
+        mdot=float(mdot)
         At=(mdot*Vt)/vt
         #print("At 1: " + (mdot/pt)*math.sqrt((Rspecific*Tt)/AverageMolecularWeight*k)) #wrong
         #print("At 2: " + str((mdot*Vt)/vt)) #derived from 3-24 on page 59 #correct
@@ -150,7 +169,7 @@ if(genfileq=="yes"):
     ws['C2'] = "m"
 
     wb.save("partgenout.xlsx")
-elif(genfileq.lower()=="no"):
+elif(genfileq.lower()=="no") or (genfileq==""):
     print("Goodbye!")
 else:
     print("Input not recognized")
@@ -160,53 +179,92 @@ print("\nHeat Transfer:")
 LOption=input("Attempt L* calculation?")
 if(LOption.lower()=="yes"):
     print("Still in progress")#stub
-elif(LOption.lower()=="no"):
-    LStar=1.5 #meters
+elif(LOption.lower()=="no") or (LOption==""):
+    pass #LStar defined at top
+
+
+
 Vc=LStar*At #chamber volume #rpe 287
-print("Vc: "+str(round(Vc, 4)))
+print("Vc: "+str(round(Vc, 8)))
 ts=Vc/(mdot*V1) #stay time #rpe 287
 print("ts: "+str(round(ts, 4)))
 
-Dc=input("Input chamber diameter: ")
+Dc=input("Input chamber diameter: (default = 3\")")
 if(Dc==""):
-    Dc=0.05 #~2 in default chamber diameter
+    Dc=0.076 #~2 in default chamber diameter
 Dc=float(Dc)
 
-A1=pi*(Dc/2)**2 #circles dawg
+A1=pi*((Dc/2)**2) #circles dawg
 
 ConvergenceAngle=input("Input Convergence half angle in deg (default 30 deg): ")
 if(ConvergenceAngle==""):
     ConvergenceAngle=math.radians(30) #default convergence angle
 
-Lc=Dc*math.tan(ConvergenceAngle) #triangles dawg
+Lc=Dc*math.tan(int(ConvergenceAngle)) #triangles dawg
 L1=(Vc-A1*Lc*(1+math.sqrt(At/A1)+At/A1))/A1 #modified from RPE pg 285
 
-print("L1: "+str(L1))
 
+
+
+
+print("L1, including conical: "+str(L1))
+print("L1, not including conical:"+str(Vc/A1))
 DeltaPQuestion=input(">INPUT< Pressure drop or >CALC< pressure drop")
 if(DeltaPQuestion.lower()=="input"):
     DeltaP_regen=input("Input Pressure Drop due to cooling passages")
     if(DeltaP_regen==""):
         DeltaP_regen=p1*.1 #default of 10% of chamber pressure
-elif(DeltaPQuestion=="calc"):
-    LenCoolantPipe=input("Input Length of coolant passage")
+elif(DeltaPQuestion=="calc" or DeltaPQuestion==""):
+    LenCoolantPipe=input("Input Length of coolant passage (default = 3\"): ")
     if(LenCoolantPipe==""):
-        LenCoolantPipe=0.4572 #~18in to m default passage length
-    eqivD=input("Input equivilent chamber diameter")
-    if(eqivD==""):
-        eqivD=0.0095 #~.375 in to m
-    f_regen=input("Input friction loss coefficient")
+        LenCoolantPipe=0.0762 #~3in to m default passage length
+    eqpipeq=input(">INPUT< or >CALC< equivilent pipe diameter: ")
+    if("input"==eqpipeq) or (""==eqpipeq):
+        eqivD=input("Input equivilent pipe diameter (default = .00699 m): ")
+        if(eqivD==""):
+            eqivD=0.00699625817
+    elif("calc"==eqpipeq):
+        #https://www.engineeringtoolbox.com/equivalent-diameter-d_205.html
+        print("for a rectangular passage")
+        a=input("input length of side one (default=.25\"): ")
+        if(a==""):
+            a=0.0064 #.25 in to m
+        a=float(a)
+        b=input("input length of side two (default=.25\"): ")
+        if (b == ""):
+            b = 0.0064  # .25 in to m
+        b=float(b)
+        eqivD=(1.3*(a*b)**.625)/((a+b)**.25)
+        print("Equivilent diameter" + str(eqivD))
+    f_regen=input("Input friction loss coefficient (default = .03): ")
     if(f_regen==""):
         f_regen=.03 #default friction loss coefficient #RPE pg 296
-    v_regen = input("Input friction loss coefficient")
+    f_regen=float(f_regen)
+    v_regen = input("Input flow velocity (default = 2.109 m/s): ")
+    if(v_regen==""):
+        v_regen=2.109
+    v_regen=float(v_regen)
     if (v_regen == ""):
         v_regen = 1  # default flow velocity
-    DeltaP_regen=.5*f_regen*v_regen^2*(LenCoolantPipe/eqivD)
-    print("Pressure drop: " + DeltaP_regen)
+    densityq=input(">INPUT< or >CALC< density")
+    if(densityq=="input"):
+        density=input("input your coolant density in kg/m^3")
+    elif(densityq=="calc") or (densityq==""):
+        ox_temp=input("Input the temperature of OX storage (default 295)")
+        if(ox_temp==""):
+            ox_temp=295
+        ox_temp=float(ox_temp)
+        density=(rho_liquid(ox_temp))
+    DeltaP_regen=.5*(f_regen*v_regen**2)*(LenCoolantPipe/eqivD)*density
+    print("Pressure drop: " + str(DeltaP_regen)+"\n")
 
-ExhaustDensity=input("Input exhaust density: ")
-if(ExhaustDensity==""):
-    ExhaustDensity=0 #stub
+print("now solving for gas film coeffcient")
+ExhaustDensityq=input(">INPUT< or >CALC< exhaust density: ")
+if(ExhaustDensityq=="calc") or (ExhaustDensityq==""):
+    ExhaustDensity=(p2*AverageMolecularWeight)/(Rspecific*T2) #stub
+else:
+    ExhaustDensity=input("input exhaust density")
+ExhaustDensity=float(ExhaustDensity)
 Prandtl=input("Input Prandtl number: ")
 if(Prandtl==""):
     Prandtl=0 #stub
