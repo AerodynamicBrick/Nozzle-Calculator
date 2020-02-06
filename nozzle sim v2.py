@@ -261,20 +261,30 @@ elif(DeltaPQuestion=="calc" or DeltaPQuestion==""):
 print("now solving for gas film coeffcient")
 ExhaustDensityq=input(">INPUT< or >CALC< exhaust density: ")
 if(ExhaustDensityq=="calc") or (ExhaustDensityq==""):
-    ExhaustDensity=(p2*AverageMolecularWeight)/(Rspecific*T2) #stub
+    print("ERROR: calc not currently working. Feeding default value")
+    ExhaustDensity = 2.4794 #stub
 else:
     ExhaustDensity=input("input exhaust density")
 ExhaustDensity=float(ExhaustDensity)
-Prandtl=input("Input Prandtl number: ")
+print("Exhaust Density: " + str(ExhaustDensity))
+Prandtl=input("Input Prandtl number (default=.72): ")
 if(Prandtl==""):
-    Prandtl=0 #stub
+    Prandtl=.72 #https://onlinelibrary.wiley.com/doi/pdf/10.1002/0471722057.app2 pg 424
+Prandtl=float(Prandtl)
 GasConductivity=input("Input Gas Conductivity: ")
 if(GasConductivity==""):
     GasConductivity=0 #stub
+
 AbsoluteGasViscosity=input("Input Absolute Gas Viscosity: ")
 if(AbsoluteGasViscosity==""):
-    AbsoluteGasViscosity=0 #stub
-GasFilmCoefficient = 0.023*(((ExhaustDensity)**.8)/(Dc**.2))*(Prandtl**.4)*GasConductivity/(AbsoluteGasViscosity**.8)
+    AbsoluteGasViscosity=(46.6*10**(-10))*((AverageMolecularWeight*2.20462)**.5)*(T1**.6) #huzal and huang p86, adjusted for units
+AbsoluteGasViscosity=float(AbsoluteGasViscosity)
+
+#GasFilmCoefficient = 0.023*(((ExhaustDensity)**.8)/(Dc**.2))*(Prandtl**.4)*GasConductivity/(AbsoluteGasViscosity**.8)
+#RoughGasFilmCoefficient=(ExhaustDensity*v1)**.8
+#GasFilmCoefficient=.023*((ExhaustDensity*p1)**.8)/(Dc**.2)*(Prandtl**.4)*(GasConductivity/AbsoluteGasViscosity)
+GasFilmCoefficient=((.026/(Dc**.2))*(((AbsoluteGasViscosity**.2)*Cp)/(Prandtl**.6))*((p1/CStar)**.8)*((Dc*NozzleRadius)**.1))*(At/A1)*sigma #huzal pg 88
+#print("Gas Film Coefficient" + GasFilmCoefficient)
 
 Cbar=input("Input Average Specific Heat of Coolant: ") #average specific heat
 if(Cbar==""):
@@ -304,4 +314,3 @@ ChamberWallConductivity=input("Input Chamber Wall Conductivity: ")
 if(ChamberWallConductivity==""):
     ChamberWallConductivity=0 #stub
 ConvectionHeatTransfer = (T1-CoolantTemperature)/(1/GasFilmCoefficient+ChamberWallThickness/ChamberWallConductivity+1/LiquidFilmCoefficient)
-
