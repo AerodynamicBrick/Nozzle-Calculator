@@ -191,7 +191,7 @@ print("ts: "+str(round(ts, 4)))
 
 Dc=input("Input chamber diameter: (default = 3\")")
 if(Dc==""):
-    Dc=0.076 #~2 in default chamber diameter
+    Dc=0.0508 #~2 in default chamber diameter
 Dc=float(Dc)
 
 A1=pi*((Dc/2)**2) #circles dawg
@@ -200,15 +200,70 @@ ConvergenceAngle=input("Input Convergence half angle in deg (default 30 deg): ")
 if(ConvergenceAngle==""):
     ConvergenceAngle=math.radians(30) #default convergence angle
 
-Lc=Dc*math.tan(int(ConvergenceAngle)) #triangles dawg
+Lc=Dc*math.tan(int(ConvergenceAngle)) #triangles dawg, pretty sure this is broke
 L1=(Vc-A1*Lc*(1+math.sqrt(At/A1)+At/A1))/A1 #modified from RPE pg 285
-
-
-
-
 
 print("L1, including conical: "+str(L1))
 print("L1, not including conical:"+str(Vc/A1))
+
+OFratio=input("input ox/fuel ratio")
+if(OFratio==""):
+    OFratio=4
+OFratio=float(OFratio)
+mdot_fuel=mdot/(OFratio+1)
+mdot_ox=mdot_fuel*OFratio
+
+print("Ox mass flow rate: "+str(mdot_ox))
+print("Fuel mass flow rate: "+str(mdot_fuel))
+
+cdoxq=input("Input Cd for Ox")
+if(cdoxq==""):
+    Cd_ox = 6.4
+else:
+    Cd_ox = float(cdoxq)
+
+cdfuelq=input("Input Cd for fuel")
+if(cdfuelq==""):
+    Cd_fuel = 6.4
+else:
+    Cd_fuel = float(cdfuelq)
+
+oxdensityq=input("Input ox density")
+if(oxdensityq==""):
+    ox_density=rho_liquid(290) #this assumes no multiphase flow
+else:
+    ox_density = float(oxdensityq)
+
+fueldensityq=input("Input fuel density")
+if(fueldensityq==""):
+    fuel_density=789
+else:
+    fuel_density = float(fueldensityq)
+
+injectionPressure=2895798 #420 psi
+
+OxInjectorArea=mdot_ox/(Cd_ox*math.sqrt(2*ox_density*(injectionPressure-p1)))
+FuelInjectorArea=mdot_fuel/(Cd_fuel*math.sqrt(2*fuel_density*(injectionPressure-p1)))
+
+print("Ox injector area: "+str(OxInjectorArea))
+print("Fuel injector area: "+str(FuelInjectorArea))
+
+oxportq=input("Input number of Ox ports")
+if(oxportq==""):
+    OxPortNumber=2
+else:
+    OxPortNumber = int(oxportq)
+
+fuelportq=input("Input number of Fuel ports")
+if(fuelportq==""):
+    FuelPortNumber=1
+else:
+    FuelPortNumber = int(fuelportq)
+
+print("Ox injector diameter"+str(2*math.sqrt((OxInjectorArea/OxPortNumber)/pi)))
+print("Fuel injector diameter"+str(2*math.sqrt((FuelInjectorArea/FuelPortNumber)/pi)))
+
+
 DeltaPQuestion=input(">INPUT< Pressure drop or >CALC< pressure drop")
 if(DeltaPQuestion.lower()=="input"):
     DeltaP_regen=input("Input Pressure Drop due to cooling passages")
@@ -217,7 +272,7 @@ if(DeltaPQuestion.lower()=="input"):
 elif(DeltaPQuestion=="calc" or DeltaPQuestion==""):
     LenCoolantPipe=input("Input Length of coolant passage (default = 3\"): ")
     if(LenCoolantPipe==""):
-        LenCoolantPipe=0.0762 #~3in to m default passage length
+        LenCoolantPipe=0.0584 #~3in to m default passage length
     eqpipeq=input(">INPUT< or >CALC< equivilent pipe diameter: ")
     if("input"==eqpipeq) or (""==eqpipeq):
         eqivD=input("Input equivilent pipe diameter (default = .00699 m): ")
